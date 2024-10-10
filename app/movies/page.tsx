@@ -7,14 +7,6 @@ import { fetchMoviesData } from "@/redux/slices/movieSlice";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-interface Movie {
-	id: number;
-	title: string;
-	overview: string;
-	poster_path: string;
-	release_date: string;
-}
-
 const MoviesPage = () => {
 	const dispatch = useAppDispatch();
 	const movies = useAppSelector((state) => state.movies.list);
