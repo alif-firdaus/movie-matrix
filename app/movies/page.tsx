@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { signOut } from "next-auth/react";
-import { fetchMovies } from "@/lib/tmdbApi";
+import React, { useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { fetchMoviesData } from "@/redux/slices/movieSlice";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 interface Movie {
@@ -14,25 +16,25 @@ interface Movie {
 }
 
 const MoviesPage = () => {
-	const [movies, setMovies] = useState<Movie[]>([]);
-	const [loading, setLoading] = useState<boolean>(true);
+	const dispatch = useAppDispatch();
+	const movies = useAppSelector((state) => state.movies.list);
+	const loading = useAppSelector((state) => state.movies.loading);
+	const error = useAppSelector((state) => state.movies.error);
+	const { data: session, status } = useSession();
+	const router = useRouter();
 
 	useEffect(() => {
-		const getMovies = async () => {
-			try {
-				const data = await fetchMovies("movie/popular");
-				setMovies(data.results);
-			} catch (error) {
-				console.error("Error fetching movies:", error);
-			} finally {
-				setLoading(false);
-			}
-		};
+		if (status === "loading") return;
 
-		getMovies();
-	}, []);
+		if (!session) {
+			router.push("/");
+		} else {
+			dispatch(fetchMoviesData("movie/popular"));
+		}
+	}, [session, status, router, dispatch]);
 
 	if (loading) return <div>Loading...</div>;
+	if (error) return <div>Error: {error}</div>;
 
 	return (
 		<div>
