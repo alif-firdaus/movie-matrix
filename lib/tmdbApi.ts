@@ -1,5 +1,5 @@
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
-const BASE_URL = "https://api.themoviedb.org/3";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export interface Movie {
 	id: number;
@@ -16,8 +16,11 @@ export interface ApiResponse {
 	total_results: number;
 }
 
-export const fetchMovies = async (endpoint: string): Promise<ApiResponse> => {
-	const url = `${BASE_URL}/${endpoint}?api_key=${API_KEY}`;
+export const fetchMovies = async (
+	endpoint: string,
+	page = 1
+): Promise<ApiResponse> => {
+	const url = `${BASE_URL}/${endpoint}?api_key=${API_KEY}&page=${page}`;
 
 	const response = await fetch(url);
 
